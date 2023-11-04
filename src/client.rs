@@ -245,8 +245,8 @@ impl<T: DaprInterface> Client<T> {
 
     /// Set sidecar Metadata
     ///
-    pub async fn get_metadata(&mut self) -> Result<GetMetadataResponse, Error> {
-        self.0.get_metadata().await
+    pub async fn get_metadata(&mut self, request: GetMetadataRequest) -> Result<GetMetadataResponse, Error> {
+        self.0.get_metadata(request).await
     }
 }
 
@@ -268,7 +268,7 @@ pub trait DaprInterface: Sized {
     async fn delete_state(&mut self, request: DeleteStateRequest) -> Result<(), Error>;
     async fn delete_bulk_state(&mut self, request: DeleteBulkStateRequest) -> Result<(), Error>;
     async fn set_metadata(&mut self, request: SetMetadataRequest) -> Result<(), Error>;
-    async fn get_metadata(&mut self) -> Result<GetMetadataResponse, Error>;
+    async fn get_metadata(&mut self, request: GetMetadataRequest) -> Result<GetMetadataResponse, Error>;
 }
 
 #[async_trait]
@@ -331,8 +331,8 @@ impl DaprInterface for dapr_v1::dapr_client::DaprClient<TonicChannel> {
         Ok(self.set_metadata(Request::new(request)).await?.into_inner())
     }
 
-    async fn get_metadata(&mut self) -> Result<GetMetadataResponse, Error> {
-        Ok(self.get_metadata(Request::new(())).await?.into_inner())
+    async fn get_metadata(&mut self, request: GetMetadataRequest) -> Result<GetMetadataResponse, Error> {
+        Ok(self.get_metadata(Request::new(request)).await?.into_inner())
     }
 }
 
@@ -371,6 +371,9 @@ pub type GetSecretRequest = dapr_v1::GetSecretRequest;
 
 /// A response from getting secret
 pub type GetSecretResponse = dapr_v1::GetSecretResponse;
+
+/// A request for getting metadata
+pub type GetMetadataRequest = dapr_v1::GetMetadataRequest;
 
 /// A response from getting metadata
 pub type GetMetadataResponse = dapr_v1::GetMetadataResponse;
